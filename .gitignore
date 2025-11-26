@@ -1,0 +1,79 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/.terraform.tfstate.lock.info
+**/terraform.tfvars
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+
+# Credentials and keys
+**/*.pem
+**/*.key
+**/*.json
+**/gcp-key.json
+**/gke-key.json
+**/aws-key.json
+**/*-credentials.json
+
+# SSH keys
+**/.ssh/
+**/id_rsa
+**/id_rsa.pub
+**/eks-aws.pem
+
+# Environment files
+**/.env
+**/.env.local
+**/.envrc
+
+# Cloud provider CLI configs
+**/.aws/
+**/.azure/
+**/.config/gcloud/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# Logs
+*.log
+**/logs/
+
+# Temporary files
+**/tmp/
+**/temp/
+**/.tmp/
+
+# Kubeconfig
+**/kubeconfig
+**/.kube/config.bak
+
+# Backup files
+*.backup
+*.old
+
+# Test files
+**/test/
+**/*_test.go
