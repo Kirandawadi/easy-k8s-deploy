@@ -7,6 +7,11 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  backend "gcs" {
+    bucket = "gke-terraform-state-bucket"
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {

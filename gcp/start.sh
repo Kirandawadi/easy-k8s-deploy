@@ -68,9 +68,22 @@ fi
 sudo apt-get update -qq
 sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 
-# Step 5: Run Terraform
+# Step 5: Create GCS bucket for Terraform state
 echo ""
-echo "Step 5: Deploying GKE cluster using Terraform..."
+echo "Step 5: Creating GCS bucket for Terraform state..."
+BUCKET_NAME="gke-terraform-state-bucket"
+if ! gsutil ls -b "gs://$BUCKET_NAME" 2>/dev/null; then
+    echo "Creating bucket $BUCKET_NAME..."
+    gsutil mb -p "$PROJECT_ID" -l us-central1 "gs://$BUCKET_NAME"
+    gsutil versioning set on "gs://$BUCKET_NAME"
+    echo "Bucket created and versioning enabled."
+else
+    echo "Bucket $BUCKET_NAME already exists."
+fi
+
+# Step 6: Run Terraform
+echo ""
+echo "Step 6: Deploying GKE cluster using Terraform..."
 cd terraform/
 
 terraform init
@@ -79,9 +92,9 @@ terraform plan
 echo ""
 terraform apply -auto-approve
 
-# Step 6: Configure kubectl
+# Step 7: Configure kubectl
 echo ""
-echo "Step 6: Configuring kubectl access..."
+echo "Step 7: Configuring kubectl access..."
 CLUSTER_NAME=$(terraform output -raw cluster_name)
 CLUSTER_LOCATION=$(terraform output -raw cluster_location)
 
@@ -89,9 +102,9 @@ gcloud container clusters get-credentials "$CLUSTER_NAME" \
     --region "$CLUSTER_LOCATION" \
     --project "$PROJECT_ID"
 
-# Step 7: Verify cluster
+# Step 8: Verify cluster
 echo ""
-echo "Step 7: Verifying cluster..."
+echo "Step 8: Verifying cluster..."
 kubectl get nodes
 
 echo ""
