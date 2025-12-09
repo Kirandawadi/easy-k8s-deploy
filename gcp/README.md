@@ -29,6 +29,7 @@ This guide explains how to obtain GCP **Service Account** credentials for deploy
    - **Compute Instance Admin (v1)** (`roles/compute.instanceAdmin.v1`)
    - **Compute Network User** (`roles/compute.networkUser`)
    - **Service Account User** (`roles/iam.serviceAccountUser`)
+   - **Storage Admin** (`roles/storage.admin`)
 9. Click **CONTINUE**
 10. Click **DONE**
 

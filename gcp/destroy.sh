@@ -59,7 +59,8 @@ echo ""
 echo "Step 4: Destroying GKE cluster using Terraform..."
 cd terraform/
 
-terraform init
+BUCKET_NAME="gke-tfstate-${PROJECT_ID}"
+terraform init -backend-config="bucket=$BUCKET_NAME"
 echo ""
 echo "WARNING: This will destroy all resources created by Terraform!"
 echo ""

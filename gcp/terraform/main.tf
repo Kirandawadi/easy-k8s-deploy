@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "gke-terraform-state-bucket"
+    # Bucket name is provided dynamically via: terraform init -backend-config="bucket=gke-tfstate-PROJECT_ID"
     prefix = "terraform/state"
   }
 }

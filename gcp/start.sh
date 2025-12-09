@@ -71,7 +71,7 @@ sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 # Step 5: Create GCS bucket for Terraform state
 echo ""
 echo "Step 5: Creating GCS bucket for Terraform state..."
-BUCKET_NAME="gke-terraform-state-bucket"
+BUCKET_NAME="gke-tfstate-${PROJECT_ID}"
 if ! gsutil ls -b "gs://$BUCKET_NAME" 2>/dev/null; then
     echo "Creating bucket $BUCKET_NAME..."
     gsutil mb -p "$PROJECT_ID" -l us-central1 "gs://$BUCKET_NAME"
@@ -86,7 +86,7 @@ echo ""
 echo "Step 6: Deploying GKE cluster using Terraform..."
 cd terraform/
 
-terraform init
+terraform init -backend-config="bucket=$BUCKET_NAME"
 echo ""
 terraform plan
 echo ""
