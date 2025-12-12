@@ -46,20 +46,70 @@ export AZURE_TENANT_ID="$AZURE_TENANT_ID"
 export AZURE_CLIENT_ID="$AZURE_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
 
-# Step 7: Run Terraform
+# Step 7: Create Azure Storage Account for Terraform state
 echo ""
-echo "Step 5: Deploying AKS cluster using Terraform..."
+echo "Step 6: Creating Azure Storage Account for Terraform state..."
+# Generate unique storage account name from subscription ID (max 24 chars, lowercase/numbers only)
+HASH=$(echo -n "$AZURE_SUBSCRIPTION_ID" | md5sum | cut -c1-14)
+STORAGE_ACCOUNT_NAME="akstfstate${HASH}"
+CONTAINER_NAME="tfstate"
+
+echo "Storage Account Name: $STORAGE_ACCOUNT_NAME"
+
+# Check if storage account exists
+if ! az storage account show --name "$STORAGE_ACCOUNT_NAME" --resource-group "$AZURE_RESOURCE_GROUP" &>/dev/null; then
+    echo "Creating storage account $STORAGE_ACCOUNT_NAME..."
+    az storage account create \
+        --name "$STORAGE_ACCOUNT_NAME" \
+        --resource-group "$AZURE_RESOURCE_GROUP" \
+        --location "$AZURE_LOCATION" \
+        --sku Standard_LRS \
+        --kind StorageV2 \
+        --allow-blob-public-access false
+    echo "Storage account created."
+else
+    echo "Storage account $STORAGE_ACCOUNT_NAME already exists."
+fi
+
+# Get storage account key
+STORAGE_ACCOUNT_KEY=$(az storage account keys list \
+    --account-name "$STORAGE_ACCOUNT_NAME" \
+    --resource-group "$AZURE_RESOURCE_GROUP" \
+    --query "[0].value" -o tsv)
+
+# Check if container exists
+if ! az storage container show \
+    --name "$CONTAINER_NAME" \
+    --account-name "$STORAGE_ACCOUNT_NAME" \
+    --account-key "$STORAGE_ACCOUNT_KEY" &>/dev/null; then
+    echo "Creating container $CONTAINER_NAME..."
+    az storage container create \
+        --name "$CONTAINER_NAME" \
+        --account-name "$STORAGE_ACCOUNT_NAME" \
+        --account-key "$STORAGE_ACCOUNT_KEY"
+    echo "Container created."
+else
+    echo "Container $CONTAINER_NAME already exists."
+fi
+
+# Step 8: Run Terraform
+echo ""
+echo "Step 7: Deploying AKS cluster using Terraform..."
 cd terraform/
 
-terraform init
+terraform init \
+    -backend-config="storage_account_name=$STORAGE_ACCOUNT_NAME" \
+    -backend-config="container_name=$CONTAINER_NAME" \
+    -backend-config="key=aks.tfstate" \
+    -backend-config="resource_group_name=$AZURE_RESOURCE_GROUP"
 echo ""
 terraform plan
 echo ""
 terraform apply -auto-approve
 
-# Step 8: Configure kubectl
+# Step 9: Configure kubectl
 echo ""
-echo "Step 6: Configuring kubectl access..."
+echo "Step 8: Configuring kubectl access..."
 CLUSTER_NAME=$(terraform output -raw cluster_name)
 RESOURCE_GROUP=$(terraform output -raw resource_group_name)
 
@@ -68,9 +118,9 @@ az aks get-credentials \
     --name "$CLUSTER_NAME" \
     --overwrite-existing
 
-# Step 9: Verify cluster
+# Step 10: Verify cluster
 echo ""
-echo "Step 7: Verifying cluster..."
+echo "Step 9: Verifying cluster..."
 kubectl get nodes
 
 echo ""

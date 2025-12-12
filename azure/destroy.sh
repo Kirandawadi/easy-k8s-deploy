@@ -51,7 +51,16 @@ echo ""
 echo "Step 6: Destroying AKS cluster using Terraform..."
 cd terraform/
 
-terraform init
+# Generate storage account name (must match start.sh)
+HASH=$(echo -n "$AZURE_SUBSCRIPTION_ID" | md5sum | cut -c1-14)
+STORAGE_ACCOUNT_NAME="akstfstate${HASH}"
+CONTAINER_NAME="tfstate"
+
+terraform init \
+    -backend-config="storage_account_name=$STORAGE_ACCOUNT_NAME" \
+    -backend-config="container_name=$CONTAINER_NAME" \
+    -backend-config="key=aks.tfstate" \
+    -backend-config="resource_group_name=$AZURE_RESOURCE_GROUP"
 echo ""
 echo "WARNING: This will destroy all resources created by Terraform!"
 echo ""

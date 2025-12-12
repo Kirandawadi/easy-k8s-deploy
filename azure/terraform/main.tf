@@ -15,6 +15,11 @@ terraform {
       version = "~> 2.3"
     }
   }
+
+  backend "azurerm" {
+    # Storage account name, container name, and key provided via -backend-config
+    # Example: terraform init -backend-config="storage_account_name=akstfstate..." -backend-config="container_name=tfstate" -backend-config="key=aks.tfstate"
+  }
 }
 
 provider "azurerm" {

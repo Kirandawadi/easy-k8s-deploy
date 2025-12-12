@@ -40,18 +40,24 @@ This guide explains how to obtain Azure **Service Principal** credentials for de
 13. **IMPORTANT**: Copy the **Value** immediately (it won't be shown again!)
     - Secret Value: `dGhpc2lzYXNlY3JldGV4YW1wbGU=`
 
-### Step 4: Assign Contributor Role
+### Step 4: Assign Required Roles
 
 14. Go to **Subscriptions** (search in top bar)
 15. Click on your subscription
 16. Click **Access control (IAM)** in the left sidebar
 17. Click **+ Add** → **Add role assignment**
-18. Search for **Contributor** role
-19. Click **Next**
-20. Click **+ Select members**
-21. Search for `aks-deployer` (your app name)
-22. Click **Select**
-23. Click **Review + assign**
+18. Add the following roles (repeat for each):
+    - **Contributor** - Required for creating AKS clusters and related resources
+    - **Storage Account Contributor** - Required for Terraform state storage
+19. For each role:
+    - Search for the role name
+    - Click **Next**
+    - Click **+ Select members**
+    - Search for `aks-deployer` (your app name)
+    - Click **Select**
+    - Click **Review + assign**
+
+**Note**: The Storage Account Contributor role is needed because Terraform state is stored in an Azure Storage Account for persistence across GitHub Actions workflow runs.
 
 
 ## Required Credentials
