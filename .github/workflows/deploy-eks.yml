@@ -20,6 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Mask sensitive inputs
+        if: github.event.inputs.AwsAccessKey != ''
+        run: |
+          AWS_ACCESS_KEY_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.AwsAccessKey')
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          AWS_SECRET_ACCESS_KEY=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.AwsSecretKey')
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+
       - name: Deploy EKS Cluster
         env:
           AWS_ACCESS_KEY_ID: ${{ github.event.inputs.AwsAccessKey || secrets.AWS_ACCESS_KEY_ID }}

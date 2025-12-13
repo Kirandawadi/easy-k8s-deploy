@@ -24,6 +24,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Mask sensitive inputs
+        if: github.event.inputs.AzureClientId != ''
+        run: |
+          AZURE_CLIENT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.AzureClientId')
+          echo "::add-mask::$AZURE_CLIENT_ID"
+          AZURE_CLIENT_SECRET=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.AzureClientSecret')
+          echo "::add-mask::$AZURE_CLIENT_SECRET"
+          AZURE_TENANT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.AzureTenantId')
+          echo "::add-mask::$AZURE_TENANT_ID"
+
       - name: Deploy AKS Cluster
         env:
           AZURE_CLIENT_ID: ${{ github.event.inputs.AzureClientId || secrets.AZURE_CLIENT_ID }}

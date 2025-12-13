@@ -4,7 +4,10 @@
 
 One-click Kubernetes cluster deployment across AWS, Azure, and GCP using GitHub Actions.
 
-Deploy production-ready Kubernetes clusters to any cloud provider with a single workflow dispatch. No local setup required - everything runs in GitHub Actions!
+Deploy PoC Kubernetes clusters to any cloud provider with a single workflow dispatch. No local setup required - everything runs in GitHub Actions!
+
+> I personally use this repo to deploy test clusters to temporary cloud environments like KodeKloud.
+> I do not recommend using this repo for production environments.
 
 ---
 
@@ -14,7 +17,6 @@ Deploy production-ready Kubernetes clusters to any cloud provider with a single 
 - **Flexible Authentication**: Use workflow inputs OR GitHub Secrets
 - **Fully Automated**: Complete deployment via GitHub Actions
 - **Easy Cleanup**: One-click cluster destruction
-- **Production-Ready**: Best practices and security configurations
 - **Cost-Optimized**: Reasonable defaults for demo/dev clusters
 - **Comprehensive Docs**: Step-by-step credential setup guides
 
@@ -65,7 +67,7 @@ Choose your cloud provider and follow the credential setup guide:
 
 ### Step 2: Choose Authentication Method
 
-#### Option A: GitHub Secrets (Recommended for Reuse)
+#### Option A: GitHub Secrets (Recommended)
 
 1. Go to your repo: **Settings** → **Secrets and variables** → **Actions**
 2. Click **New repository secret**
@@ -85,9 +87,17 @@ Choose your cloud provider and follow the credential setup guide:
 - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
 - `GOOGLE_PRIVATE_KEY`
 
-#### Option B: Workflow Dispatch Inputs (One-Time Deployment)
+#### Option B: Workflow Dispatch Inputs
 
 No setup needed - just paste credentials when running the workflow!
+
+> **⚠️ SECURITY WARNING ⚠️**
+>
+> Even though the workflow dispatch inputs has been masked and it won't be visible in the workflow run logs, this is still not a good practice.
+> The recommended approach is to use the GitHub Secrets method.
+>
+> Only use this method if your repository is **PRIVATE**.
+
 
 ### Step 3: Deploy Cluster
 

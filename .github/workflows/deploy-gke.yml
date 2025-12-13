@@ -24,6 +24,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Mask sensitive inputs
+        if: github.event.inputs.GoogleProjectId != ''
+        run: |
+          GOOGLE_PROJECT_ID=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.GoogleProjectId')
+          echo "::add-mask::$GOOGLE_PROJECT_ID"
+          GOOGLE_SERVICE_ACCOUNT_EMAIL=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.GoogleServiceAccountEmail')
+          echo "::add-mask::$GOOGLE_SERVICE_ACCOUNT_EMAIL"
+          GOOGLE_PRIVATE_KEY=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.GooglePrivateKey')
+          echo "::add-mask::$GOOGLE_PRIVATE_KEY"
+
       - name: Deploy GKE Cluster
         env:
           GOOGLE_PROJECT_ID: ${{ github.event.inputs.GoogleProjectId || secrets.GOOGLE_PROJECT_ID }}
