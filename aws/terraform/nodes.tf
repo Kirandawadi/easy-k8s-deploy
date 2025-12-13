@@ -164,7 +164,7 @@ resource "aws_launch_template" "node_launch_template" {
   }
 
   key_name      = aws_key_pair.eks_kp.key_name
-  instance_type = "c7i-flex.large"
+  instance_type = "t3.medium"
   vpc_security_group_ids = [
     aws_security_group.node_security_group.id
   ]
