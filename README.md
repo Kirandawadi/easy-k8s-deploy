@@ -26,21 +26,23 @@ Deploy PoC Kubernetes clusters to any cloud provider with a single workflow disp
 
 ### AWS EKS
 - **Cluster**: EKS control plane in us-east-1
-- **Nodes**: 2x c7i-flex.large EC2 instances (Auto Scaling Group: min 1, max 3)
+- **Nodes**: 2x `t3.medium` EC2 instances (Auto Scaling Group: min 1, max 3)
 - **Networking**: Default VPC with public subnets across 3 availability zones
 - **Storage**: Terraform state stored in S3 bucket
 - **IAM**: Custom roles for cluster and node instances
 
+> **Note:** AWS Free Tier accounts do not support the `t3.medium` instance type. If you are using a Free Tier account, edit `nodes.tf` to use the `c7i-flex.large` instance type instead.
+
 ### Azure AKS
 - **Cluster**: AKS control plane (Free tier)
-- **Nodes**: 2x Standard_D2s_v3 VMs (system node pool)
+- **Nodes**: 2x `Standard_D2s_v3` VMs (system node pool)
 - **Networking**: Azure-managed networking (single availability zone)
 - **Storage**: Terraform state stored in Azure Storage Account
 - **Identity**: System-assigned managed identity
 
 ### GCP GKE
 - **Cluster**: GKE cluster in us-central1
-- **Nodes**: 2x e2-medium VMs (managed node pool)
+- **Nodes**: 2x `e2-medium` VMs (managed node pool)
 - **Networking**: VPC-native with Workload Identity
 - **Storage**: Terraform state stored in GCS bucket
 - **Security**: Shielded instances with secure boot and integrity monitoring
