@@ -179,7 +179,7 @@ resource "aws_launch_template" "node_launch_template" {
   image_id = data.aws_ssm_parameter.node_ami.value
 
   metadata_options {
-    http_put_response_hop_limit = 2
+    http_put_response_hop_limit = 1
     http_endpoint               = "enabled"
     http_tokens                 = "optional"
   }
