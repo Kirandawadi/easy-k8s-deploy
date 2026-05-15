@@ -31,24 +31,39 @@ echo "Step 3: Auto-detecting Azure Subscription..."
 export AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 echo "Detected Subscription ID: $AZURE_SUBSCRIPTION_ID"
 
-# Step 4: Auto-detect Resource Group
+# Step 4: Set the subscription as active
 echo ""
-echo "Step 4: Auto-detecting Resource Group..."
-export AZURE_RESOURCE_GROUP=$(az group list --query "[0].name" -o tsv)
-echo "Detected Resource Group: $AZURE_RESOURCE_GROUP"
+echo "Step 4: Setting active subscription..."
+az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+echo "Active subscription set to: $AZURE_SUBSCRIPTION_ID"
 
-# Step 5: Get location from the Resource Group
-export AZURE_LOCATION=$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)
-echo "Detected Location: $AZURE_LOCATION"
+# Step 5: Set Resource Group
+# echo ""
+# echo "Step 5: Auto-detecting Resource Group..."
+# export AZURE_RESOURCE_GROUP=$(az group list --query "[0].name" -o tsv)
+# echo "Detected Resource Group: $AZURE_RESOURCE_GROUP"
+export AZURE_RESOURCE_GROUP="TestRG" # Hardcoded for now
 
-# Step 6: Export credentials for Terraform
+# Step 6: Get location from the Resource Group
+# export AZURE_LOCATION=$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)
+# echo "Detected Location: $AZURE_LOCATION"
+
+export AZURE_LOCATION="centralus" # Hardcoded for now
+
+# Step 7: Export credentials for Terraform (both AZURE_* for external data source and ARM_* for backend)
 export AZURE_TENANT_ID="$AZURE_TENANT_ID"
 export AZURE_CLIENT_ID="$AZURE_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
 
-# Step 7: Create Azure Storage Account for Terraform state
+# ARM_* variables are used by Terraform azurerm backend for Service Principal authentication
+export ARM_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
+export ARM_TENANT_ID="$AZURE_TENANT_ID"
+export ARM_CLIENT_ID="$AZURE_CLIENT_ID"
+export ARM_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
+
+# Step 8: Create Azure Storage Account for Terraform state
 echo ""
-echo "Step 6: Creating Azure Storage Account for Terraform state..."
+echo "Step 8: Creating Azure Storage Account for Terraform state..."
 # Generate unique storage account name from subscription ID (max 24 chars, lowercase/numbers only)
 HASH=$(echo -n "$AZURE_SUBSCRIPTION_ID" | md5sum | cut -c1-14)
 STORAGE_ACCOUNT_NAME="akstfstate${HASH}"
@@ -92,9 +107,9 @@ else
     echo "Container $CONTAINER_NAME already exists."
 fi
 
-# Step 8: Run Terraform
+# Step 9: Run Terraform
 echo ""
-echo "Step 7: Deploying AKS cluster using Terraform..."
+echo "Step 9: Deploying AKS cluster using Terraform..."
 cd terraform/
 
 terraform init \
@@ -107,9 +122,9 @@ terraform plan
 echo ""
 terraform apply -auto-approve
 
-# Step 9: Configure kubectl
+# Step 10: Configure kubectl
 echo ""
-echo "Step 8: Configuring kubectl access..."
+echo "Step 10: Configuring kubectl access..."
 CLUSTER_NAME=$(terraform output -raw cluster_name)
 RESOURCE_GROUP=$(terraform output -raw resource_group_name)
 
@@ -118,9 +133,9 @@ az aks get-credentials \
     --name "$CLUSTER_NAME" \
     --overwrite-existing
 
-# Step 10: Verify cluster
+# Step 11: Verify cluster
 echo ""
-echo "Step 9: Verifying cluster..."
+echo "Step 11: Verifying cluster..."
 kubectl get nodes
 
 echo ""

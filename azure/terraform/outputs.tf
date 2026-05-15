@@ -18,6 +18,16 @@ output "cluster_id" {
   value       = azurerm_kubernetes_cluster.aks.id
 }
 
+output "kubernetes_version" {
+  description = "Kubernetes version of the cluster"
+  value       = azurerm_kubernetes_cluster.aks.kubernetes_version
+}
+
+output "node_os_sku" {
+  description = "Operating system SKU for nodes"
+  value       = azurerm_kubernetes_cluster.aks.default_node_pool[0].os_sku
+}
+
 output "kube_config_commands" {
   description = "Commands to configure kubectl access"
   value = join("\n", [

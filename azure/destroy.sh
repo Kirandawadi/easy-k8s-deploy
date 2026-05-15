@@ -31,24 +31,32 @@ echo "Step 3: Auto-detecting Azure Subscription..."
 export AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 echo "Detected Subscription ID: $AZURE_SUBSCRIPTION_ID"
 
-# Step 4: Auto-detect Resource Group
+# Step 4: Set the subscription as active
 echo ""
-echo "Step 4: Auto-detecting Resource Group..."
-export AZURE_RESOURCE_GROUP=$(az group list --query "[0].name" -o tsv)
-echo "Detected Resource Group: $AZURE_RESOURCE_GROUP"
+echo "Step 4: Setting active subscription..."
+az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+echo "Active subscription set to: $AZURE_SUBSCRIPTION_ID"
 
-# Step 5: Get location from the Resource Group
-export AZURE_LOCATION=$(az group show --name "$AZURE_RESOURCE_GROUP" --query location -o tsv)
-echo "Detected Location: $AZURE_LOCATION"
+# Step 5: Set Resource Group (must match start.sh)
+export AZURE_RESOURCE_GROUP="TestRG" # Hardcoded for now
 
-# Export credentials for Terraform
+# Step 6: Set location (must match start.sh)
+export AZURE_LOCATION="centralus" # Hardcoded for now
+
+# Step 7: Export credentials for Terraform (both AZURE_* and ARM_*)
 export AZURE_TENANT_ID="$AZURE_TENANT_ID"
 export AZURE_CLIENT_ID="$AZURE_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
 
-# Step 6: Run Terraform Destroy
+# ARM_* variables are used by Terraform azurerm backend for Service Principal authentication
+export ARM_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
+export ARM_TENANT_ID="$AZURE_TENANT_ID"
+export ARM_CLIENT_ID="$AZURE_CLIENT_ID"
+export ARM_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
+
+# Step 8: Run Terraform Destroy
 echo ""
-echo "Step 6: Destroying AKS cluster using Terraform..."
+echo "Step 8: Destroying AKS cluster using Terraform..."
 cd terraform/
 
 # Generate storage account name (must match start.sh)

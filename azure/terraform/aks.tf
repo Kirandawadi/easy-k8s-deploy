@@ -3,6 +3,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   location            = data.external.environment.result["location"]
   resource_group_name = data.external.environment.result["resource_group_name"]
   dns_prefix          = "${var.cluster_name}-${random_string.dns.result}"
+  kubernetes_version  = var.kubernetes_version
 
   sku_tier = "Free"
 
@@ -17,7 +18,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name       = "sysnp"
     vm_size    = var.vm_size
     node_count = var.node_count
-    os_sku     = "Ubuntu"
+    os_sku     = var.os_sku
 
     upgrade_settings {
       drain_timeout_in_minutes      = 0

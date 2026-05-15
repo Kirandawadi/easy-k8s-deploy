@@ -48,7 +48,6 @@ data "aws_iam_policy_document" "assume_role_ec2" {
 }
 
 # IAM role to assign to worker nodes
-# WARNING: AdministratorAccess attached for security testing only!
 # This demonstrates BadPod privilege escalation scenarios.
 resource "aws_iam_role" "node_instance_role" {
   name               = var.node_role_name
@@ -58,7 +57,6 @@ resource "aws_iam_role" "node_instance_role" {
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-    "arn:aws:iam::aws:policy/AdministratorAccess"  # For BadPods testing
   ]
   path = "/"
 }
@@ -167,7 +165,7 @@ resource "aws_launch_template" "node_launch_template" {
   }
 
   key_name      = aws_key_pair.eks_kp.key_name
-  instance_type = "t3.medium"
+  instance_type = "c7i-flex.large"
   vpc_security_group_ids = [
     aws_security_group.node_security_group.id
   ]
@@ -181,7 +179,7 @@ resource "aws_launch_template" "node_launch_template" {
   metadata_options {
     http_put_response_hop_limit = 1
     http_endpoint               = "enabled"
-    http_tokens                 = "optional"
+    http_tokens                 = "required"
   }
 
   tag_specifications {
@@ -226,9 +224,10 @@ NODEADM_EXIT=$?
             --resource NodeGroup  \
             --region us-east-1
 
-# Security testing: Demonstrate privilege escalation
+# Thesis security testing: Demonstrate privilege escalation
 # A compromised node with admin permissions can grant admin access to users
-aws iam attach-user-policy --user-name "CUSTOM-USERNAME" --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+# Not used now
+# aws iam attach-user-policy --user-name "CUSTOM-USERNAME" --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
 
 --==BOUNDARY==--
 EOF

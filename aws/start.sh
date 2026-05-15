@@ -46,6 +46,9 @@ curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/
 sed -i "s/<.*>/arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role\/eks-demo-node/" aws-auth-cm.yaml
 kubectl apply -f aws-auth-cm.yaml
 
+
+# attach policy arn
+#aws iam attach-role-policy --role-name eks-demo-node --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
 oidc=$(aws eks describe-cluster --name demo-eks --query cluster.identity.oidc.issuer --output text | sed 's/https:\/\///g')
 cat <<EOF > trust-policy.json
 {
